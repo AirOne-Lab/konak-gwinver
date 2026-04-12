@@ -48,13 +48,13 @@
     <div class="legend-item"><div class="legend-dot" style="background:#9FE1CB;"></div> Réservation</div>
     <div class="legend-item"><div class="legend-dot" style="background:#D3D1C7;"></div> Indisponible</div>
   </div>
-  <div class="updated">Mis à jour le 12/04/2026 à 23h11</div>
+  <div class="updated">Mis à jour le 12/04/2026 à 23h19</div>
 </div>
 
 <script>
 const JOURS    = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MOIS_NOM = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const reservations = [{"debut": "2026-05-14", "fin": "2026-05-17", "nom": "À compléter", "type": "resa"}, {"debut": "2026-07-17", "fin": "2026-08-01", "nom": "Marianne G.  ·  2 adultes · 2 enfants", "type": "resa"}, {"debut": "2026-06-06", "fin": "2026-06-20", "nom": "Famille K.  ·  2 adultes · 🐕", "type": "resa"}, {"debut": "2026-07-01", "fin": "2026-07-09", "nom": "", "type": "bloque"}, {"debut": "2026-08-01", "fin": "2026-08-16", "nom": "Martin B.  ·  2 adultes", "type": "resa"}, {"debut": "2026-10-23", "fin": "2026-10-30", "nom": "", "type": "bloque"}];
+const reservations = [{"debut": "2026-05-14", "fin": "2026-05-17", "nom": "À compléter", "type": "resa"}, {"debut": "2026-07-17", "fin": "2026-08-01", "nom": "[Airbnb] Marianne G.  ·  2 adultes · 2 enfants", "type": "resa"}, {"debut": "2026-06-06", "fin": "2026-06-20", "nom": "[Karin Minor] Famille K.  ·  2 adultes · 🐕", "type": "resa"}, {"debut": "2026-07-01", "fin": "2026-07-09", "nom": "", "type": "bloque"}, {"debut": "2026-08-01", "fin": "2026-08-16", "nom": "[Airbnb] Martin B.  ·  2 adultes", "type": "resa"}, {"debut": "2026-10-23", "fin": "2026-10-30", "nom": "", "type": "bloque"}];
 const COLORS = { resa: { bg:'#9FE1CB', text:'#085041' }, bloque: { bg:'#D3D1C7', text:'#444441' } };
 
 let currentYear  = new Date().getFullYear();
