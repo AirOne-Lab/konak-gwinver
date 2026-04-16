@@ -1,0 +1,31 @@
+name: Mise à jour calendrier
+
+on:
+  schedule:
+    - cron: '0 6,18 * * *'  # 6h et 18h UTC (8h et 20h heure française)
+  workflow_dispatch:  # permet aussi de lancer manuellement
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Installer dépendances
+        run: pip install requests
+
+      - name: Lancer le script
+        run: python generer_calendrier.py
+
+      - name: Commit et push
+        run: |
+          git config user.name "Konak Bot"
+          git config user.email "bot@konak-gwinver.fr"
+          git add calendrier_prestataires.html calendrier_prestataires.ics
+          git diff --staged --quiet || git commit -m "Mise à jour automatique $(date '+%d/%m/%Y %H:%M')"
+          git push
