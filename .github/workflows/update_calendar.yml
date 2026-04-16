@@ -33,5 +33,4 @@ jobs:
           git add calendrier_prestataires.html calendrier_prestataires.ics
           git diff --staged --quiet && echo "Rien à committer" && exit 0
           git commit -m "Mise à jour automatique $(date '+%d/%m/%Y %H:%M')"
-          git pull --rebase origin main
-          git push origin main
+          git push --force origin main
