@@ -2,8 +2,8 @@ name: Mise à jour calendrier
 
 on:
   schedule:
-    - cron: '0 6,18 * * *'  # 6h et 18h UTC (8h et 20h heure française)
-  workflow_dispatch:  # permet aussi de lancer manuellement
+    - cron: '0 6,18 * * *'
+  workflow_dispatch:
 
 jobs:
   update:
