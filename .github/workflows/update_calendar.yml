@@ -26,11 +26,26 @@ jobs:
       - name: Lancer le script
         run: python generer_calendrier.py
 
-      - name: Commit et push
+      - name: Push via API GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "Konak Bot"
-          git config user.email "bot@konak-gwinver.fr"
-          git add calendrier_prestataires.html calendrier_prestataires.ics
-          git diff --staged --quiet && echo "Rien à committer" && exit 0
-          git commit -m "Mise à jour automatique $(date '+%d/%m/%Y %H:%M')"
-          git push --force origin main
+          python3 - <<'EOF'
+          import base64, os, requests
+
+          token = os.environ["GITHUB_TOKEN"]
+          repo  = "AirOne-Lab/konak-gwinver"
+          headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+
+          for filename in ["calendrier_prestataires.html", "calendrier_prestataires.ics"]:
+              with open(filename, "rb") as f:
+                  content = base64.b64encode(f.read()).decode()
+              url = f"https://api.github.com/repos/{repo}/contents/{filename}"
+              sha = requests.get(url, headers=headers).json().get("sha", "")
+              requests.put(url, headers=headers, json={
+                  "message": f"Mise à jour automatique {filename}",
+                  "content": content,
+                  "sha": sha
+              })
+          print("Fichiers mis à jour via API GitHub")
+          EOF
