@@ -53,7 +53,7 @@
     <div class="legend-item"><div class="legend-dot" style="background:#7FB3D3;"></div> JC Intervention</div>
     <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#F0A87B 0px,#F0A87B 4px,rgba(255,255,255,0.4) 4px,rgba(255,255,255,0.4) 10px);"></div> JC Indispo</div>
   </div>
-  <div class="updated">Mis à jour le 19/04/2026 à 21h24</div>
+  <div class="updated">Mis à jour le 19/04/2026 à 21h27</div>
 </div>
 
 <script>
@@ -170,7 +170,7 @@ function render() {
         txt.textContent = label;
         txt.title = label;
         txt.style.cssText = `position:absolute;top:${top + 3}px;` +
-          (role === 'arrive' ? `left:calc(50% + 6px);` : `left:6px;`) +
+        (role === 'arrive' && !estJourneeUnique ? `left:calc(50% + 6px);` : `left:6px;`) +
           `height:${BAR_H - 6}px;line-height:${BAR_H - 6}px;` +
           `font-size:14px;font-weight:500;color:${c.text};` +
           `white-space:nowrap;overflow:visible;z-index:5;pointer-events:none;`;
