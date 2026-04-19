@@ -18,8 +18,7 @@
   .month-label { font-size: 20px; font-weight: 500; min-width: 160px; text-align: center; }
   .day-labels { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
   .day-label { text-align: center; font-size: 16px; color: #888780; padding: 6px 0; font-weight: 500; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; overflow: hidden; }
-  .day { min-height: 120px; border-radius: 8px; padding: 6px 0; background: white; overflow: visible; position: relative; border: 1px solid #EEECEA; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; overflow: hidden; }  .day { min-height: 120px; border-radius: 8px; padding: 6px 0; background: white; overflow: visible; position: relative; border: 1px solid #EEECEA; }
   .day.other-month { opacity: 0.25; }
   .day.today { border: 2px solid #378ADD; }
   .day-num { font-size: 16px; color: #888780; padding: 0 8px; margin-bottom: 3px; font-weight: 500; }
@@ -48,13 +47,13 @@
     <div class="legend-item"><div class="legend-dot" style="background:#9FE1CB;"></div> Réservation</div>
     <div class="legend-item"><div class="legend-dot" style="background:#D3D1C7;"></div> Indisponible</div>
   </div>
-  <div class="updated">Mis à jour le 17/04/2026 à 08h09</div>
+  <div class="updated">Mis à jour le 19/04/2026 à 19h56</div>
 </div>
 
 <script>
 const JOURS    = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MOIS_NOM = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const reservations = [{"debut": "2026-05-14", "fin": "2026-05-17", "nom": "Yves Altmeisch - 3 adultes [Airbnb]", "type": "resa"}, {"debut": "2026-07-17", "fin": "2026-08-01", "nom": "Marianne Grosclaude - 2 adultes - 2 enfants [Airbnb]", "type": "resa"}, {"debut": "2026-06-06", "fin": "2026-06-20", "nom": "Famille Kubak - 2 adultes - 🐕 [Karin Minor]", "type": "resa"}, {"debut": "2026-08-01", "fin": "2026-08-16", "nom": "Martin Betzwieser - 2 adultes [Airbnb]", "type": "resa"}, {"debut": "2026-10-23", "fin": "2026-10-30", "nom": "", "type": "bloque"}, {"debut": "2026-07-01", "fin": "2026-07-09", "nom": "On Est Ensemble", "type": "bloque"}];
+const reservations = [{"debut": "2026-05-14", "fin": "2026-05-17", "nom": "Yves Altmeisch - 3 adultes [Airbnb]", "type": "resa"}, {"debut": "2026-07-17", "fin": "2026-08-01", "nom": "Marianne Grosclaude - 2 adultes - 2 enfants [Airbnb]", "type": "resa"}, {"debut": "2026-06-06", "fin": "2026-06-20", "nom": "Famille Kubak - 2 adultes - 🐕 [Karin Minor]", "type": "resa"}, {"debut": "2026-08-01", "fin": "2026-08-16", "nom": "Martin Betzwieser - 2 adultes [Airbnb]", "type": "resa"}, {"debut": "2026-10-23", "fin": "2026-10-30", "nom": "", "type": "bloque"}];
 const COLORS = { resa: { bg:'#9FE1CB', text:'#085041' }, bloque: { bg:'#D3D1C7', text:'#444441' } };
 
 let currentYear  = new Date().getFullYear();
@@ -92,7 +91,7 @@ function render() {
     return el;
   });
 
-  const GAP = 4, BAR_H = 28, BASE_TOP = 34, TRACK_H = 32;
+const GAP = 4, BAR_H = 28, BASE_TOP = 34, TRACK_H = 32;
 
   reservations.forEach((r, ri) => {
     const tDebut = ts(new Date(r.debut));
@@ -102,11 +101,14 @@ function render() {
     const track  = ri % 2;
     const top    = BASE_TOP + track * TRACK_H;
 
+    // Pour chaque ligne de la grille, trouver le premier idx du séjour
+    // (arrivée ou mid) pour y placer le label
     const labelByRow = {};
     cells.forEach((cell, idx) => {
       if (!cell.inMonth) return;
       const t   = ts(cell.date);
       const row = Math.floor(idx / 7);
+      // inclure le jour d'arrivée (demi-case droite) et les jours mid
       if (t >= tDebut && t < tFin && !(row in labelByRow)) {
         labelByRow[row] = idx;
       }
@@ -124,6 +126,7 @@ function render() {
       else if (t > tDebut && t < tFin) role = 'mid';
       if (role === 'none') return;
 
+      // Barre colorée
       const bar = document.createElement('div');
       bar.title = label;
       bar.style.cssText = `position:absolute;top:${top}px;height:${BAR_H}px;background:${c.bg};z-index:3;cursor:default;`;
@@ -143,7 +146,8 @@ function render() {
       }
       cellEls[idx].appendChild(bar);
 
-      if (labelByRow[row] === idx) {
+      // Label : premier idx du séjour sur cette ligne
+   if (labelByRow[row] === idx) {
         const txt = document.createElement('div');
         txt.textContent = label;
         txt.title = label;
