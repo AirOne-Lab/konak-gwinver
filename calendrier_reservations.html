@@ -53,7 +53,7 @@
     <div class="legend-item"><div class="legend-dot" style="background:#7FB3D3;"></div> JC Intervention</div>
     <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#F0A87B 0px,#F0A87B 4px,rgba(255,255,255,0.4) 4px,rgba(255,255,255,0.4) 10px);"></div> JC Indispo</div>
   </div>
-  <div class="updated">Mis à jour le 19/04/2026 à 20h31</div>
+  <div class="updated">Mis à jour le 19/04/2026 à 21h16</div>
 </div>
 
 <script>
@@ -115,6 +115,7 @@ function render() {
     const top    = BASE_TOP + track * TRACK_H;
 
     const labelByRow = {};
+    const estJourneeUnique = tDebut === tFin - 86400000;
     cells.forEach((cell, idx) => {
       if (!cell.inMonth) return;
       const t   = ts(cell.date);
@@ -143,9 +144,16 @@ function render() {
           bar.style.background = `repeating-linear-gradient(45deg, ${c.bg} 0px, ${c.bg} 4px, rgba(255,255,255,0.4) 4px, rgba(255,255,255,0.4) 10px)`;
       }
       if (role === 'arrive') {
-        bar.style.left         = '50%';
-        bar.style.right        = col === 6 ? '0' : (-GAP) + 'px';
-        bar.style.borderRadius = '10px 0 0 10px';
+        if (estJourneeUnique) {
+          bar.style.left         = col === 0 ? '0' : (-GAP) + 'px';
+          bar.style.right        = col === 6 ? '0' : (-GAP) + 'px';
+          bar.style.borderRadius = '10px';
+        } else {
+          bar.style.left         = '50%';
+          bar.style.right        = col === 6 ? '0' : (-GAP) + 'px';
+          bar.style.borderRadius = '10px 0 0 10px';
+        }
+      }
       } else if (role === 'depart') {
         bar.style.left         = col === 0 ? '0' : (-GAP) + 'px';
         bar.style.right        = '50%';
@@ -155,6 +163,7 @@ function render() {
         bar.style.right        = col === 6 ? '0' : (-GAP) + 'px';
         bar.style.borderRadius = '0';
       }
+      if (role === 'depart' && estJourneeUnique) return;
       cellEls[idx].appendChild(bar);
 
       if (labelByRow[row] === idx) {
