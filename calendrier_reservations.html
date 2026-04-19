@@ -48,12 +48,12 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#9FE1CB;"></div> Réservation</div>
     <div class="legend-item"><div class="legend-dot" style="background:#D3D1C7;"></div> Indisponible</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#F5D76E;"></div> M&C Intervention</div>
-    <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#F1948A 0px,#F1948A 4px,rgba(255,255,255,0.4) 4px,rgba(255,255,255,0.4) 10px);"></div> M&C Indispo</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#7FB3D3;"></div> JC Intervention</div>
-    <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#F0A87B 0px,#F0A87B 4px,rgba(255,255,255,0.4) 4px,rgba(255,255,255,0.4) 10px);"></div> JC Indispo</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F5D76E;"></div> Madeleine & Claude - Intervention</div>
+    <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#F1948A 0px,#F1948A 4px,rgba(255,255,255,0.4) 4px,rgba(255,255,255,0.4) 10px);"></div> Madeleine & Claude Indisponibles</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7FB3D3;"></div> Jean-Christophe - Intervention</div>
+    <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#F0A87B 0px,#F0A87B 4px,rgba(255,255,255,0.4) 4px,rgba(255,255,255,0.4) 10px);"></div> Jean-Christophe Indisponible</div>
   </div>
-  <div class="updated">Mis à jour le 19/04/2026 à 21h28</div>
+  <div class="updated">Mis à jour le 19/04/2026 à 21h33</div>
 </div>
 
 <script>
@@ -111,8 +111,27 @@ function render() {
     const tFin   = ts(new Date(r.fin));
     const c      = COLORS[r.type];
     const label  = r.nom || (r.type === 'bloque' ? 'Indisponible' : '');
-    const track  = ri % 2;
-    const top    = BASE_TOP + track * TRACK_H;
+    // Trouver un track libre (sans chevauchement)
+    const track = (() => {
+      for (let t = 0; t < 5; t++) {
+        const overlap = reservations.slice(0, ri).some((prev, pi) => {
+          const usedTrack = (() => {
+            for (let tt = 0; tt < 5; tt++) {
+              const o = reservations.slice(0, pi).some((p2, p2i) => {
+                return p2i < pi && ts(new Date(p2.debut)) < ts(new Date(prev.fin)) && ts(new Date(p2.fin)) > ts(new Date(prev.debut));
+              });
+              if (!o) return tt; return -1;
+            }
+            return 0;
+          })();
+          return usedTrack === t &&
+            ts(new Date(prev.debut)) < tFin &&
+            ts(new Date(prev.fin)) > tDebut;
+        });
+        if (!overlap) return t;
+      }
+      return 0;
+    })();    const top    = BASE_TOP + track * TRACK_H;
 
     const labelByRow = {};
     const estJourneeUnique = tDebut === tFin - 86400000;
