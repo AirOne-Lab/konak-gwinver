@@ -1,0 +1,6 @@
+flask
+anthropic
+requests
+gspread
+google-auth
+google-auth-oauthlib
