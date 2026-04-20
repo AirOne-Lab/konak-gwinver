@@ -16,8 +16,13 @@ import re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-from config import ANTHROPIC_API_KEY, INFOMANIAK_MAIL_TOKEN
+try:
+    from config import ANTHROPIC_API_KEY, INFOMANIAK_MAIL_TOKEN
+except ImportError:
+    ANTHROPIC_API_KEY    = os.getenv("ANTHROPIC_API_KEY")
+    INFOMANIAK_MAIL_TOKEN = os.getenv("INFOMANIAK_MAIL_TOKEN")
 
+    
 app = Flask(__name__)
 
 SHEETS_CSV        = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkgs-a_GuintVIJofGGwKzpRLbr1d208HkP8O_62gkI-vQFLPPdq2REww7MLJKidqft8KYiSh6Zyfl/pub?gid=653745516&single=true&output=csv"
