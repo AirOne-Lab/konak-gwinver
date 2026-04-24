@@ -5,7 +5,6 @@ import re
 import gspread
 from datetime import datetime
 from google.oauth2.service_account import Credentials
-from config import INFOMANIAK_MAIL_PASSWORD
 
 # ─── CONFIG ───────────────────────────────────────────────────
 SHEET_ID   = "10iXoRnR08aqT1LOSS0sAXtAQP6HUuFlhZ13BQSKpQ6s"
@@ -22,10 +21,21 @@ MOIS_FR  = ["janv.", "févr.", "mars", "avr.", "mai", "juin",
              "juil.", "août", "sept.", "oct.", "nov.", "déc."]
 
 # ─── GOOGLE SHEETS ────────────────────────────────────────────
+import os, json, tempfile
+
 SCOPES = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds  = Credentials.from_service_account_file("google_credentials.json", scopes=SCOPES)
-gc     = gspread.authorize(creds)
-ws     = gc.open_by_key(SHEET_ID).worksheet(SHEET_TAB)
+
+def get_google_ws():
+    creds_json = os.getenv("GOOGLE_CREDENTIALS")
+    if creds_json:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            f.write(creds_json)
+            f.flush()
+            creds = Credentials.from_service_account_file(f.name, scopes=SCOPES)
+    else:
+        creds = Credentials.from_service_account_file("google_credentials.json", scopes=SCOPES)
+    gc = gspread.authorize(creds)
+    return gc.open_by_key(SHEET_ID).worksheet(SHEET_TAB)
 
 def codes_existants():
     valeurs = ws.col_values(1)  # colonne ID
