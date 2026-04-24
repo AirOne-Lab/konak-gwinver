@@ -53,13 +53,13 @@
     <div class="legend-item"><div class="legend-dot" style="background:#7FB3D3;"></div> Jean-Christophe - Intervention</div>
     <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#F0A87B 0px,#F0A87B 4px,rgba(255,255,255,0.4) 4px,rgba(255,255,255,0.4) 10px);"></div> Jean-Christophe Indisponible</div>
   </div>
-  <div class="updated">Mis à jour le 20/04/2026 à 22h40</div>
+  <div class="updated">Mis à jour le 24/04/2026 à 13h15</div>
 </div>
 
 <script>
 const JOURS    = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MOIS_NOM = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const reservations = [{"debut": "2026-05-14", "fin": "2026-05-17", "nom": "Yves Altmeisch - 3 adultes [Airbnb]", "type": "resa", "track": 0}, {"debut": "2026-07-17", "fin": "2026-08-01", "nom": "Marianne Grosclaude - 2 adultes - 2 enfants [Airbnb]", "type": "resa", "track": 0}, {"debut": "2026-06-06", "fin": "2026-06-20", "nom": "Famille Kubak - 2 adultes - 🐕 [Karin Minor]", "type": "resa", "track": 0}, {"debut": "2026-08-01", "fin": "2026-08-16", "nom": "Martin Betzwieser - 2 adultes [Airbnb]", "type": "resa", "track": 0}, {"debut": "2026-10-23", "fin": "2026-10-30", "nom": "", "type": "bloque", "track": 0}, {"debut": "2026-07-01", "fin": "2026-07-09", "nom": "On Est Ensemble", "type": "bloque", "track": 0}, {"debut": "2026-04-27", "fin": "2026-04-28", "nom": "M&C - Intervention", "type": "mc_intervention", "track": 0}, {"debut": "2026-04-27", "fin": "2026-04-28", "nom": "JC - Intervention", "type": "jc_intervention", "track": 1}, {"debut": "2026-04-27", "fin": "2026-04-30", "nom": "M&C - Indispo", "type": "mc_indispo", "track": 2}];
+const reservations = [{"debut": "2026-05-14", "fin": "2026-05-17", "nom": "Yves Altmeisch - 3 adultes [Airbnb]", "type": "resa", "track": 0}, {"debut": "2026-07-17", "fin": "2026-08-01", "nom": "Marianne Grosclaude - 2 adultes - 2 enfants [Airbnb]", "type": "resa", "track": 0}, {"debut": "2026-04-30", "fin": "2026-05-04", "nom": "", "type": "bloque", "track": 0}, {"debut": "2026-05-21", "fin": "2026-05-25", "nom": "", "type": "bloque", "track": 0}, {"debut": "2026-06-06", "fin": "2026-06-20", "nom": "Famille Kubak - 2 adultes - 🐕 [Karin Minor]", "type": "resa", "track": 0}, {"debut": "2026-08-01", "fin": "2026-08-16", "nom": "Martin Betzwieser - 2 adultes [Airbnb]", "type": "resa", "track": 0}, {"debut": "2026-10-23", "fin": "2026-10-30", "nom": "", "type": "bloque", "track": 0}, {"debut": "2026-07-01", "fin": "2026-07-09", "nom": "On Est Ensemble", "type": "bloque", "track": 0}];
 const COLORS = {
   resa:           { bg:'#9FE1CB', text:'#085041' },
   bloque:         { bg:'#D3D1C7', text:'#444441' },
@@ -104,7 +104,7 @@ function render() {
     return el;
   });
 
-  const GAP = 4, BAR_H = 28, BASE_TOP = 34, TRACK_H = 32;
+const GAP = 4, BAR_H = 26, BASE_TOP = 34, TRACK_H = 30;
 
   reservations.forEach((r, ri) => {
     const tDebut = ts(new Date(r.debut));
