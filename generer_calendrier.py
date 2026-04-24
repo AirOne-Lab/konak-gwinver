@@ -26,7 +26,7 @@ GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 AIRBNB_ICAL   = "https://www.airbnb.fr/calendar/ical/50521285.ics?t=7c5371b4a5ee43ae8516110449d3fd45"
 BOOKING_ICAL  = "https://ical.booking.com/v1/export/t/27f1af14-7ccd-4175-8421-08a4b8132bda.ics"
 GREENGO_ICAL  = "https://calendars.greengo.voyage/calendar/greengo-icalendar/fffaa45c-3093-408a-95c4-92f2811c3672.ics"
-BLOCAGES_ICAL = "https://sync.infomaniak.com/calendars/EG06668/b0f766d8-2cbe-4d5b-8903-a4352d31861e?export"
+BLOCAGES_ICAL = "https://sync.infomaniak.com/calendars/EG06668/05054034-6697-481d-a546-c246c41eb8b4?export"
 SHEETS_CSV    = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkgs-a_GuintVIJofGGwKzpRLbr1d208HkP8O_62gkI-vQFLPPdq2REww7MLJKidqft8KYiSh6Zyfl/pub?gid=653745516&single=true&output=csv"
 
 INFOMANIAK_CALENDAR_ID = 2128878
@@ -276,7 +276,8 @@ def lire_nouveaux_emails():
         SCOPES = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         creds  = Credentials.from_service_account_file("google_credentials.json", scopes=SCOPES)
         gc     = gspread.authorize(creds)
-        ws     = gc.open_by_key("10iXoRnR08aqT1LOSS0sAXtAQP6HUuFlhZ13BQSKpQ6s").worksheet("2025-26")
+        from lire_email import get_google_ws
+        ws = get_google_ws()        
         codes  = set(ws.col_values(1))
 
         mail = imaplib.IMAP4_SSL("mail.infomaniak.com")
