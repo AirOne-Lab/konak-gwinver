@@ -24,6 +24,10 @@ jobs:
         run: pip install requests gspread google-auth google-auth-oauthlib
       - name: Lancer le script
         run: python generer_calendrier.py
+      - name: Lancer Konak Gwinver
+        run: python generer_calendrier.py
+      - name: Lancer Custine  
+        run: python generer_custine.py
       - name: Push via API GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
