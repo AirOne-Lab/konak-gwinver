@@ -99,7 +99,14 @@ def ajouter_dans_sheets(ws, infos):
     annee_d = determiner_annee(infos.get("depart_mois", 0))
     arrivee = datetime(annee_a, infos["arrivee_mois"], infos["arrivee_jour"])
     depart  = datetime(annee_d, infos["depart_mois"],  infos["depart_jour"])
+    
+    # 🔍 NOUVEAU : Ignorer les réservations passées
+    if depart < datetime.now():
+        print(f"⏭️  Ignoré (passé) : {infos.get('nom')} - Départ {depart.strftime('%Y-%m-%d')}")
+        return
+    
     nuits   = (depart - arrivee).days
+
     
     ligne = [
         infos.get("code", ""),
