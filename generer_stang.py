@@ -197,7 +197,7 @@ def sync_infomaniak(evenements):
 
     # Supprimer les événements existants créés par le script
     TITRES_SCRIPT = ["À compléter"]
-    KEYWORDS_SCRIPT = ["adulte", "enfant", "🐕", "[Airbnb]", "[Booking]", "[GreenGo]", "[Karin Minor]", "[Direct]", "À compléter"]
+    KEYWORDS_SCRIPT = ["adulte", "enfant", "🐕", "[Airbnb]", "[Booking]", "[GreenGo]", "[Karin Minor]", "[Direct]", "À compléter", "Indisponible"]    
     for e in events:
         titre = e.get("title", "")
         if titre in TITRES_SCRIPT or any(k in titre for k in KEYWORDS_SCRIPT):
@@ -207,12 +207,21 @@ def sync_infomaniak(evenements):
             )
             time.sleep(2)
 
-    # Recréer tous les événements
+# Recréer tous les événements
     for e in evenements:
-        if e["type"] != "resa":
-          continue
-        titre = e["nom"] if e["nom"] else "À compléter"
-        
+        # Synchroniser réservations ET blocages (sauf ceux qui viennent déjà d'Infomaniak)
+        if e["type"] not in ("resa", "bloque"):
+            continue
+        if e["type"] == "bloque" and e.get("source") == "Perso":
+            continue  # Les blocages Perso viennent déjà d'Infomaniak
+    
+        # Titre reconnaissable selon le type
+        if e["type"] == "resa":
+            titre = e["nom"] if e["nom"] else "À compléter"
+        else:  # type == "bloque"
+            source = e.get("source", "")
+            titre = f"[{source}] Indisponible" if source else "Indisponible"
+    
         resp = requests.post(
             "https://api.infomaniak.com/1/calendar/pim/event",
             headers=headers,
@@ -228,12 +237,13 @@ def sync_infomaniak(evenements):
                 "timezone_end":   "Europe/Paris",
             }
         )
-    
     time.sleep(2)
+    
  
 
     nb_resas = len([e for e in evenements if e["type"] == "resa"])
-    print(f"✅ Infomaniak synchronisé : {nb_resas} réservation(s)")
+    nb_blocs = len([e for e in evenements if e["type"] == "bloque" and e.get("source") != "Perso"])
+    print(f"✅ Infomaniak synchronisé : {nb_resas} réservation(s), {nb_blocs} blocage(s)")
 
 # Calcul des tracks (anti-superposition)
 def calculer_tracks(evenements):
@@ -272,47 +282,86 @@ def push_github():
 
 
 
+# Remplacer la fonction lire_nouveaux_emails dans generer_stang.py
+# À partir de la ligne ~250
+
 def lire_nouveaux_emails():
     try:
         from config import INFOMANIAK_MAIL_PASSWORD
         SCOPES = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         creds  = Credentials.from_service_account_file("google_credentials.json", scopes=SCOPES)
         gc     = gspread.authorize(creds)
-        from lire_email import get_google_ws
-        ws = get_google_ws()        
+        ws     = gc.open_by_key("10iXoRnR08aqT1LOSS0sAXtAQP6HUuFlhZ13BQSKpQ6s").worksheet("2025-26")
         codes  = set(ws.col_values(1))
 
         mail = imaplib.IMAP4_SSL("mail.infomaniak.com")
         mail.login("konak-gwinver@ik.me", INFOMANIAK_MAIL_PASSWORD)
+        
+        # 🆕 Créer le dossier "Traité Bot" s'il n'existe pas
+        try:
+            mail.create('"Traité Bot"')
+            print("📁 Dossier 'Traité Bot' créé")
+        except:
+            pass  # Dossier existe déjà
+        
         mail.select("INBOX")
         _, messages = mail.search(None, 'ALL')
         nb = 0
+        emails_a_deplacer = []  # Liste des emails traités
+        
         for num in messages[0].split():
             _, data = mail.fetch(num, '(RFC822)')
             msg   = email_lib.message_from_bytes(data[0][1])
             parts = email.header.decode_header(msg['Subject'])
             sujet = "".join(p.decode(c or 'utf-8', errors='ignore') if isinstance(p, bytes) else p for p, c in parts)
+            
+            # 🆕 Ignorer les forwards et transferts
+            if "Fwd:" in sujet or "Tr:" in sujet or "RE:" in sujet:
+                continue
+            
             if "Réservation confirmée" not in sujet:
                 continue
+            
             corps = ""
             for part in msg.walk():
                 if part.get_content_type() == "text/plain":
                     corps = part.get_payload(decode=True).decode('utf-8', errors='ignore')
                     break
+            
             NOMS_KONAK = ["À l'abri des regards", "Konak", "Stang", "au bord de l'océan"]
             if not any(n in corps for n in NOMS_KONAK):
                 continue
+            
             infos = extraire_infos_airbnb(corps)
             code  = infos.get("code", "")
+            
             if not code or code in codes:
                 continue
+            
             ajouter_dans_sheets(ws, infos)
             nb += 1
+            
+            # 🆕 Marquer pour déplacement
+            emails_a_deplacer.append(num)
+        
+        # 🆕 Déplacer les emails traités
+        for num in emails_a_deplacer:
+            try:
+                mail.copy(num, '"Traité Bot"')
+                mail.store(num, '+FLAGS', '\\Deleted')
+            except Exception as e:
+                print(f"⚠️  Erreur déplacement email {num}: {e}")
+        
+        # 🆕 Vider la corbeille (supprimer définitivement les emails déplacés de INBOX)
+        mail.expunge()
+        
         mail.logout()
         print(f"✅ Emails traités : {nb} nouvelle(s) réservation(s) ajoutée(s)")
+        if nb > 0:
+            print(f"📁 {nb} email(s) déplacé(s) vers 'Traité Bot'")
+        
     except Exception as e:
         print(f"⚠️  Emails : {e}")
-
 
 
 
@@ -356,8 +405,10 @@ for r in resas:
         nom, type_event = "JC - Intervention", "jc_intervention"
     elif "jc - indispo" in titre_low:
         nom, type_event = "JC - Indispo", "jc_indispo"
-    elif est_perso:
-        nom        = titre.replace("Perso - ", "").replace("Perso -", "").strip()
+    #elif est_perso:
+        #nom        = titre.replace("Perso - ", "").replace("Perso -", "").strip()
+        nom        = titre
+
         type_event = "bloque"
     else:
         sejour = index_sejours.get(r["debut"])
