@@ -1,5 +1,5 @@
 # generer_stang.py
-# Konak Gwinver — Génère calendrier_reservations.html + .ics
+# Stang — Génère calendrier_reservations.html + .ics
 
 import warnings
 import requests
