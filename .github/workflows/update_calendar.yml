@@ -37,7 +37,7 @@ jobs:
           repo  = "AirOne-Lab/konak-gwinver"
           headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
 
-          for filename in ["calendrier_prestataires.html", "calendrier_prestataires.ics"]:
+          for filename in ["calendrier_reservations.html", "calendrier_reservations.ics"]:
               with open(filename, "rb") as f:
                   content = base64.b64encode(f.read()).decode()
               url = f"https://api.github.com/repos/{repo}/contents/{filename}"
