@@ -1,42 +1,38 @@
 name: Mise à jour calendrier
-
 on:
   schedule:
     - cron: '0 6,18 * * *'
   workflow_dispatch:
-
 jobs:
   update:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      INFOMANIAK_TOKEN: ${{ secrets.INFOMANIAK_TOKEN }}
+      INFOMANIAK_MAIL_TOKEN: ${{ secrets.INFOMANIAK_MAIL_TOKEN }}
+      INFOMANIAK_MAIL_PASSWORD: ${{ secrets.INFOMANIAK_MAIL_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Installer Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Installer dépendances
-        run: pip install requests
-
+        run: pip install requests gspread google-auth google-auth-oauthlib
       - name: Lancer le script
         run: python generer_calendrier.py
-
       - name: Push via API GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 - <<'EOF'
           import base64, os, requests
-
           token = os.environ["GITHUB_TOKEN"]
           repo  = "AirOne-Lab/konak-gwinver"
           headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
-
           for filename in ["calendrier_reservations.html", "calendrier_reservations.ics"]:
               with open(filename, "rb") as f:
                   content = base64.b64encode(f.read()).decode()
