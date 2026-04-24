@@ -29,7 +29,7 @@ GREENGO_ICAL  = "https://calendars.greengo.voyage/calendar/greengo-icalendar/fff
 OVERALL_STANG_ICAL = "https://sync.infomaniak.com/calendars/EG06668/05054034-6697-481d-a546-c246c41eb8b4?export"
 SHEETS_CSV    = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkgs-a_GuintVIJofGGwKzpRLbr1d208HkP8O_62gkI-vQFLPPdq2REww7MLJKidqft8KYiSh6Zyfl/pub?gid=653745516&single=true&output=csv"
 
-INFOMANIAK_CALENDAR_ID = 2128878
+INFOMANIAK_CALENDAR_ID = 2145746
 
 MOIS = {
     "janv.": 1, "févr.": 2, "mars": 3, "avr.": 4,
@@ -210,8 +210,9 @@ def sync_infomaniak(evenements):
     # Recréer tous les événements
     for e in evenements:
         if e["type"] != "resa":
-            continue
+          continue
         titre = e["nom"] if e["nom"] else "À compléter"
+        
         resp = requests.post(
             "https://api.infomaniak.com/1/calendar/pim/event",
             headers=headers,
@@ -227,7 +228,8 @@ def sync_infomaniak(evenements):
                 "timezone_end":   "Europe/Paris",
             }
         )
-        time.sleep(2)
+    
+    time.sleep(2)
  
 
     nb_resas = len([e for e in evenements if e["type"] == "resa"])
